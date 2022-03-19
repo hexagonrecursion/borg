@@ -1213,13 +1213,19 @@ class TestPassphrase:
     def test_argon2(self, monkeypatch):
         # Arrange
         monkeypatch.setenv('BORG_PASSPHRASE', "hello, pass phrase")
-        Passphrase.new()
+        p = Passphrase.new()
 
         # Act
-        enc_key, mac_key = Passphrase.argon2(
+        enc_key, mac_key = p.argon2(
             salt=b'salt'*16,
             time_cost=1,
             memory_cost=2**10,
             parallelism=1,
             type=argon2.low_level.Type.I
         )
+
+        # Assert
+        assert len(enc_key)*8 == 256
+        assert len(mac_key)*8 == 256
+        assert enc_key == b'\n\x93\x03\x1fZ\xc1y\x99\xden\xbagA\xba\xb2(\xec\xd6\xb8\x15\xeaf\x9d\x8a\xbc\xf0?\xc2\x16\xfa\xa8\x1f'
+        assert mac_key == b'\xa7\x16\x12\xe1\x08\xa6\x93\xcc\xb5I\x91\xbf\xd0|}\x88\xe7\x0e_\xd6\xbb\xc5@EuL\x07\x9b\x92I\xc3l'
