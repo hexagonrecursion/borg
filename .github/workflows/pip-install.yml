@@ -1,0 +1,59 @@
+# The purpose of this workflow is to confirm that `pip install borg` works
+name: try-pip-install
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  generate-sdist:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Install Linux packages
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y pkg-config build-essential
+        sudo apt-get install -y libssl-dev libacl1-dev libxxhash-dev libdeflate-dev liblz4-dev libzstd-dev
+        sudo apt-get install -y libfuse-dev fuse || true  # Required for Python llfuse module
+        sudo apt-get install -y libfuse3-dev fuse3 || true  # Required for Python pyfuse3 module        
+    - name: Install Python requirements
+      run: |
+        python -m pip install --upgrade pip setuptools wheel
+        pip install build
+        pip install -r requirements.d/development.txt
+    - name: Generate an sdist
+      run: |
+        python -m build .
+    - name: Upload sdist as an artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: sdist
+        path: dist/borgbackup-*.tar.gz
+  try-installing-sdist:
+    needs: generate-sdist
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Install Linux packages
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y pkg-config build-essential
+        sudo apt-get install -y libssl-dev libacl1-dev libxxhash-dev libdeflate-dev liblz4-dev libzstd-dev
+        sudo apt-get install -y libfuse-dev fuse || true  # Required for Python llfuse module
+        sudo apt-get install -y libfuse3-dev fuse3 || true  # Required for Python pyfuse3 module        
+    - name: Download the sdist
+      uses: actions/download-artifact@v3
+      with:
+        name: sdist
+    - name: Try installing borg from an sdist
+      run: |
+        python -m pip install dist/borgbackup-*.tar.gz
