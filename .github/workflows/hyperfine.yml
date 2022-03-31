@@ -1,7 +1,7 @@
 on:
   workflow_dispatch:
 jobs:
-  hello-job:
+  benchmark:
     strategy:
       matrix:
         mock-kdf: [true, false]
