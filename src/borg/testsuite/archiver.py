@@ -16,7 +16,7 @@ import sys
 import tempfile
 import time
 import unittest
-from binascii import unhexlify, b2a_base64
+from binascii import unhexlify, b2a_base64, a2b_base64
 from configparser import ConfigParser
 from datetime import datetime
 from datetime import timezone
@@ -3602,6 +3602,39 @@ id: 2 / e29442 3506da 4e1ea7 / 25f62a 5a3d41 - 02
 
         self.cmd('create', self.repository_location + '::test2', 'input')
         assert os.path.exists(nonce)
+
+    def test_init_defaults_to_argon2(self):
+        """https://github.com/borgbackup/borg/issues/747#issuecomment-1076160401"""
+        self.cmd('init', '--encryption=repokey', self.repository_location)
+        with Repository(self.repository_path) as repository:
+            key = msgpack.unpackb(a2b_base64(repository.load_key()))
+        assert key[b'algorithm'] == b'argon2 aes256-ctr hmac-sha256'
+
+    def test_init_with_explicit_key_algorithm(self):
+        """https://github.com/borgbackup/borg/issues/747#issuecomment-1076160401"""
+        self.cmd('init', '--encryption=repokey', '--key-algorithm', 'pbkdf2', self.repository_location)
+        with Repository(self.repository_path) as repository:
+            key = msgpack.unpackb(a2b_base64(repository.load_key()))
+        assert key[b'algorithm'] == b'sha256'
+
+    def test_change_passphrase_does_not_change_algorithm(self):
+        self.cmd('init', '--encryption=repokey', '--key-algorithm', 'argon2', self.repository_location)
+        os.environ['BORG_NEW_PASSPHRASE'] = 'newpassphrase'
+
+        self.cmd('key', 'change-passphrase', self.repository_location)
+
+        with Repository(self.repository_path) as repository:
+            key = msgpack.unpackb(a2b_base64(repository.load_key()))
+            assert key[b'algorithm'] == b'argon2 aes256-ctr hmac-sha256'
+
+    def test_change_location_does_not_change_algorithm(self):
+        self.cmd('init', '--encryption=keyfile', '--key-algorithm', 'argon2', self.repository_location)
+
+        self.cmd('key', 'change-location', self.repository_location, 'repokey')
+
+        with Repository(self.repository_path) as repository:
+            key = msgpack.unpackb(a2b_base64(repository.load_key()))
+            assert key[b'algorithm'] == b'argon2 aes256-ctr hmac-sha256'
 
 
 @unittest.skipUnless('binary' in BORG_EXES, 'no borg.exe available')
