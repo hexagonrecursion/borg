@@ -25,6 +25,6 @@ jobs:
       env:
         BORG_LIBDEFLATE_PREFIX: /usr
     - name: DEBUG
-      run: py.test src/borg/testsuite/archive.py
+      run: tox -e py3 -- src/borg/testsuite/archive.py
     - name: do the benchmark
       run: hyperfine --runs 5 'py.test src/borg/testsuite/archive.py'
