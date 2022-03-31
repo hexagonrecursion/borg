@@ -6,6 +6,8 @@ jobs:
       matrix:
         mock-kdf: [true, false]
     runs-on: ubuntu-latest
+    env:
+      BORG_LIBDEFLATE_PREFIX: /usr
     steps:
     - name: Install hyperfine
       run: |
@@ -22,8 +24,6 @@ jobs:
         sudo apt-get install -y libfuse3-dev fuse3 || true  # Required for Python pyfuse3 module
     - run: pip install -r requirements.d/development.txt
     - run: pip install -e .
-      env:
-        BORG_LIBDEFLATE_PREFIX: /usr
     - name: DEBUG
       run: tox -e py3 -- src/borg/testsuite/archive.py
     - name: do the benchmark
