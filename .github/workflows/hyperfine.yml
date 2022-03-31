@@ -24,5 +24,7 @@ jobs:
     - run: pip install -e .
       env:
         BORG_LIBDEFLATE_PREFIX: /usr
+    - name: DEBUG
+      run: py.test src/borg/testsuite/archive.py
     - name: do the benchmark
       run: hyperfine --runs 5 'py.test src/borg/testsuite/archive.py'
