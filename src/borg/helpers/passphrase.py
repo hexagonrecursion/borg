@@ -152,6 +152,9 @@ class Passphrase(str):
         parallelism,
         type: Literal['i', 'd', 'id']
     ) -> bytes:
+        mock = os.environb.get(b"BORG_TESTONLY_MOCK_ARGON2")
+        if mock is not None:
+            return mock
         type_map = {
             'i': argon2.low_level.Type.I,
             'd': argon2.low_level.Type.D,
