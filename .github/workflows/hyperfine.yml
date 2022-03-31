@@ -4,7 +4,7 @@ jobs:
   benchmark:
     strategy:
       matrix:
-        mock-kdf: [true, false]
+        mock-kdf: ['yes', '']
     runs-on: ubuntu-latest
     env:
       BORG_LIBDEFLATE_PREFIX: /usr
