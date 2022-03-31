@@ -27,7 +27,6 @@ jobs:
         sudo apt-get install -y libfuse3-dev fuse3 || true  # Required for Python pyfuse3 module
     - run: pip install -r requirements.d/development.txt
     - run: pip install -e .
-    - name: DEBUG
-      run: py.test src/borg/testsuite/archive.py
-    - name: do the benchmark
-      run: hyperfine --runs 5 'py.test src/borg/testsuite/archive.py'
+    - run: hyperfine --runs 5 'py.test src/borg/testsuite/archive.py'
+      env:
+        BORG_TESTONLY_MOCK_KDF: ${{mock-kdf}}
