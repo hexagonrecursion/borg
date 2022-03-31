@@ -14,6 +14,9 @@ jobs:
         wget https://github.com/sharkdp/hyperfine/releases/download/v1.13.0/hyperfine_1.13.0_amd64.deb
         sudo dpkg -i hyperfine_1.13.0_amd64.deb
     - uses: actions/checkout@v3
+      with:
+        # just fetching 1 commit is not enough for setuptools-scm, so we fetch all
+        fetch-depth: 0
     - uses: actions/setup-python@v3.0.0
     - name: Install native deps
       run: |
