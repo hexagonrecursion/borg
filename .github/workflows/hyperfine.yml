@@ -1,1 +1,14 @@
-
+on:
+  workflow_dispatch:
+jobs:
+  hello-job:
+    strategy:
+      matrix:
+        mock-kdf: [true, false]
+    runs-on: ubuntu-latest
+    steps:
+    - run: |
+        wget https://github.com/sharkdp/hyperfine/releases/download/v1.13.0/hyperfine_1.13.0_amd64.deb
+        sudo dpkg -i hyperfine_1.13.0_amd64.deb
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v3.0.0
