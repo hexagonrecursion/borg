@@ -2,9 +2,6 @@ on:
   workflow_dispatch:
 jobs:
   benchmark:
-    strategy:
-      matrix:
-        mock-kdf: ['yes', '']
     runs-on: ubuntu-latest
     env:
       BORG_LIBDEFLATE_PREFIX: /usr
@@ -27,6 +24,6 @@ jobs:
         sudo apt-get install -y libfuse3-dev fuse3 || true  # Required for Python pyfuse3 module
     - run: pip install -r requirements.d/development.txt
     - run: pip install -e .
-    - run: hyperfine --runs 5 'py.test src/borg/testsuite/archive.py'
-      env:
-        BORG_TESTONLY_MOCK_KDF: ${{mock-kdf}}
+    - run: |
+        COMMON=(pytest src/borg/testsuite/{archiver,benchmark,cache,crypto,key,remote}.py)
+        hyperfine --ignore-failure --warmup 1 --runs 5 "BORG_TESTONLY_MOCK_KDF=1 ${COMMON[*]}" "${COMMON[*]}"
