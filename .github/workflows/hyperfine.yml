@@ -5,6 +5,10 @@ jobs:
     runs-on: ubuntu-latest
     env:
       BORG_LIBDEFLATE_PREFIX: /usr
+    strategy:
+      fail-fast: false
+      matrix:
+        confirm-that-results-are-reproducible: [0,1,2,3]
     steps:
     - name: Install hyperfine
       run: |
