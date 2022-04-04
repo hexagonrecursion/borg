@@ -30,4 +30,4 @@ jobs:
     - run: pip install -e .
     - run: |
         COMMON=(pytest src/borg/testsuite/{archiver,benchmark,cache,crypto,key,remote}.py)
-        hyperfine --ignore-failure --warmup 1 --runs 5 "TESTONLY_MOCK_KDF=1 ${COMMON[*]}" "${COMMON[*]}"
+        hyperfine --ignore-failure --warmup 1 --runs 5 "TESTONLY_MOCK_KDF=skip ${COMMON[*]}" "TESTONLY_MOCK_KDF=weaken ${COMMON[*]}" "${COMMON[*]}"
