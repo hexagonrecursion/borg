@@ -261,6 +261,7 @@ class CryptoTestCase(BaseTestCase):
 
 
 def test_decrypt_key_file_argon2_aes256_ctr_hmac_sha256(monkeypatch):
+    monkeypatch.setenv('BORG_TESTONLY_WEAKEN_KDF', '1')
     plain = b'hello'
     # echo -n "hello, pass phrase" | argon2 saltsaltsaltsalt -id -t 1 -k 8 -p 1 -l 64 -r
     key = bytes.fromhex('d07cc7f9cfb483303e0b9fec176b2a9c559bb70c3a9fb0d5f9c0c23527cd09570212449f09f8cd28c1a41b73fa0098e889c3f2642e87c392e51f95d70d248d9d')
