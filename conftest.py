@@ -29,6 +29,8 @@ def clean_env(tmpdir_factory, monkeypatch):
     for key in keys:
         monkeypatch.delenv(key, raising=False)
     # Speed up tests
+    if os.environ.get('FULL_KDF'):
+        return
     monkeypatch.setenv("BORG_TESTONLY_WEAKEN_KDF", "1")
 
 
